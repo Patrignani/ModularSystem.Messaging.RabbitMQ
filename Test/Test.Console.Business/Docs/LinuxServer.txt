@@ -1,0 +1,43 @@
+﻿mkdir publish
+sudo dotnet publish ./git/messaging.rabbitmq/Test/Test.Console.Business/ -c Release -f netcoreapp3.1 -o ~/publish
+
+Coloque-o na cd /etc/systemd/system pasta com, digamos, um nome TestConsole.Service, criar arquivo:
+sudo touch TestConsole.Service
+Editar o arquivo
+sudo vim TestConsole.Service
+
+colar
+
+[Unit]
+Description=Test 
+
+[Service]
+ExecStart=/bin/sh $HOME/files/script.sh
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+systemctl unmask TestConsole.Service
+
+
+Verifique se o seu script executável com:
+
+sudo chmod u+x TestConsole.Service
+Inicie:
+
+sudo systemctl start TestConsole
+Permita que ele seja executado na inicialização:
+
+sudo systemctl enable TestConsole
+
+Pare com isso:
+
+sudo systemctl stop TestConsole
+
+Comandos 
+
+rm - r [folder]
+

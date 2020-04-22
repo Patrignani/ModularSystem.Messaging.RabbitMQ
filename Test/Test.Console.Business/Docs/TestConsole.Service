@@ -1,0 +1,8 @@
+﻿[Unit]
+Description=Test Console
+
+[Service]
+ExecStart=/git/messaging.rabbitmq/Test/Test.Console.Business/bin/release/netcoreapp3.1/publish/Test.Console.Business
+
+[Install]
+WantedBy=multi-user.target

@@ -36,7 +36,7 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
                 var replyProps = channel.CreateBasicProperties();
                 replyProps.CorrelationId = props.CorrelationId;
 
-                var message = Encoding.UTF8.GetString(body);
+                var message = Encoding.UTF8.GetString(body.ToArray());
                 var requestCommand = JsonConvert.DeserializeObject<TCommand>(message);
 
                 var responseAwait = handler.HandleWithEventAsync(requestCommand).GetAwaiter();

@@ -1,6 +1,5 @@
 ﻿using ModularSystem.Messaging.RabbitMQ.Core.Command;
 using ModularSystem.Messaging.RabbitMQ.Core.DTOs;
-using ModularSystem.Messaging.RabbitMQ.Core.Event;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -35,12 +34,10 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
                                  routingKey: queuName,
                                  basicProperties: properties,
                                  body: body);
-
         }
 
         public async Task<TResult> SendAsync<TResult>(IModel channel, Command<TResult> command, string queueName = null, bool deleteQueue = true)
         {
-
             var replyQueueName = channel.QueueDeclare().QueueName;
             var respQueue = new BlockingCollection<string>();
 
@@ -57,7 +54,7 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
             void Consumer_Received(object sender, BasicDeliverEventArgs e)
             {
                 var body = e.Body;
-                var response = Encoding.UTF8.GetString(body);
+                var response = Encoding.UTF8.GetString(body.ToArray());
                 if (e.BasicProperties.CorrelationId == correlationId)
                 {
                     respQueue.Add(response);

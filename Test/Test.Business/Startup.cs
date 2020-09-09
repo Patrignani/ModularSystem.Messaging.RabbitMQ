@@ -29,9 +29,14 @@ namespace Test.Business
             {
                 options.AddConnection("rabbitmq");
             })
-              .RequestReplyCommand<UserCommandGetAll, ICollection<User>, UserHandle>()
+              .RequestReplyCommand<UserCommandGetAll, ICollection<User>, UserHandle>(option => {
+                  option.QueueName = "Teste";
+              })
               .RequestReplyCommand<UserCommandGet, User, UserHandle>()
-              .SubscribeToCommand<UserCommandDelete, UserHandle>()
+              .SubscribeToCommand<UserCommandDelete, UserHandle>(option => {
+                  option.BasicQos = false;
+                  option.AutoAck = false;
+              })
               .RequestReplyCommand<UserCommandInsert, UserId, UserHandle>()
               .SubscribeToCommand<UserCommandUpdate, UserHandle>();
 

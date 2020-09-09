@@ -66,29 +66,35 @@ namespace ModularSystem.Messaging.RabbitMQ.ServiceHost
             _serviceCollection = serviceCollection;
         }
 
-        public BusBuilder RequestReplyCommand<TCommand, TCommandResult, THandler>(IocTypes types = IocTypes.Scoped)
+        public BusBuilder RequestReplyCommand<TCommand, TCommandResult, THandler>(Action<QueueConfigurationOptionsReply> optionAction = null)
             where TCommand : Command<TCommandResult>
             where THandler : ICommandHandler<TCommand, TCommandResult>
         {
-            AddIocResult<TCommand, TCommandResult, THandler>(types);
+            var option = new QueueConfigurationOptionsReply();
+            optionAction?.Invoke(option);
+
+            AddIocResult<TCommand, TCommandResult, THandler>(option.Types);
 
             var handler = _scope.ServiceProvider
                 .GetRequiredService<ICommandHandler<TCommand, TCommandResult>>();
 
-            _bus.WithRequestReply(handler, _trackException);
+            _bus.WithRequestReply(handler, _trackException, option);
             return this;
         }
 
-        public BusBuilder SubscribeToCommand<TCommand, THandler>(IocTypes types = IocTypes.Scoped)
+        public BusBuilder SubscribeToCommand<TCommand, THandler>(Action<QueueConfigurationOptionsSubscribe> optionAction = null)
             where TCommand : Command
             where THandler : ICommandHandler<TCommand>
         {
-            AddIocSubscribe<TCommand, THandler>(types);
+            var option = new QueueConfigurationOptionsSubscribe();
+            optionAction?.Invoke(option);
+
+            AddIocSubscribe<TCommand, THandler>(option.Types);
 
             var handler = _scope.ServiceProvider
                 .GetRequiredService<ICommandHandler<TCommand>>();
 
-            _bus.SubscribeToCommand(handler);
+            _bus.SubscribeToCommand(handler, option);
             return this;
         }
 

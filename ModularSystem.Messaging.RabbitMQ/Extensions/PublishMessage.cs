@@ -38,7 +38,7 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
 
         }
 
-        public async Task<TResult> SendAsync<TResult>(IModel channel, Command<TResult> command, string queueName = null)
+        public async Task<TResult> SendAsync<TResult>(IModel channel, Command<TResult> command, string queueName = null, bool deleteQueue = true)
         {
 
             var replyQueueName = channel.QueueDeclare().QueueName;
@@ -49,6 +49,7 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
             var correlationId = Guid.NewGuid().ToString();
             properties.CorrelationId = correlationId;
             properties.ReplyTo = replyQueueName;
+            var replyToDelete = properties.ReplyTo;
 
             var consumer = new EventingBasicConsumer(channel);
 
@@ -60,6 +61,9 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
                 if (e.BasicProperties.CorrelationId == correlationId)
                 {
                     respQueue.Add(response);
+
+                    if(deleteQueue)
+                    channel.QueueDelete(replyToDelete);
                 }
             }
 

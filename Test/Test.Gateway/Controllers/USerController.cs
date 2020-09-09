@@ -30,7 +30,7 @@ namespace Test.Gateway.Controllers
             for (var count = 0; count < 2; count++)
             {
                 var userCommand = new UserCommandGetAll();
-                tasks.Add(_bus.PublishWaitAsync(userCommand));
+                tasks.Add(_bus.PublishWaitAsync(userCommand, "Teste"));
                
             }
 

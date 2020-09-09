@@ -5,6 +5,7 @@ using ModularSystem.Messaging.RabbitMQ.Core.DTOs;
 using ModularSystem.Messaging.RabbitMQ.Core.EventBus;
 using ModularSystem.Messaging.RabbitMQ.EventBus;
 using ModularSystem.Messaging.RabbitMQ.Extensions;
+using ModularSystem.Messaging.RabbitMQ.ServiceHost;
 using RabbitMQ.Client;
 using System;
 
@@ -12,7 +13,7 @@ namespace ModularSystem.Messaging.RabbitMQ
 {
     public static class ConfigureServicesRabbitMQ
     {
-        public static IServiceCollection AddRabbitMQ(this IServiceCollection services, 
+        public static BusBuilder AddRabbitMQ(this IServiceCollection services, 
             IConfiguration configuration,
             Action<RabbitMQOption> optionAction)
         {
@@ -32,7 +33,11 @@ namespace ModularSystem.Messaging.RabbitMQ
             services.AddSingleton(queues);
             services.AddSingleton((RabbitMQTrackException)option);
 
-            return services;
+            var serverProvaider = services.BuildServiceProvider();
+
+            IModel bus = serverProvaider.GetRequiredService<IModel>();
+
+            return new BusBuilder(bus, services);
         }
 
         public static string GetQueueName<T>() => $"{typeof(T).Name}";

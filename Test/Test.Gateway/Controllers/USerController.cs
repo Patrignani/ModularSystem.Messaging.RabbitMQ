@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using ModularSystem.Messaging.RabbitMQ.Core.DTOs;
 using ModularSystem.Messaging.RabbitMQ.Core.EventBus;
 using Test.Signature.Command.User;
+using Test.Signature.DTOs;
 
 namespace Test.Gateway.Controllers
 {
@@ -25,16 +26,18 @@ namespace Test.Gateway.Controllers
         public async Task<ActionResult> Get()
         {
 
-            ICollection<Signature.DTOs.User> @return = null;
-
-            for (var count = 0; count < 1; count++)
+            var tasks = new List<Task<RabbitRPC<ICollection<User>>>>();
+            for (var count = 0; count < 2; count++)
             {
                 var userCommand = new UserCommandGetAll();
-                var value = await _bus.PublishWaitAsync(userCommand);
-                @return = value.Data;
+                tasks.Add(_bus.PublishWaitAsync(userCommand));
+               
             }
-           
-            return Ok(@return);
+
+            var values = await Task.WhenAll(tasks);
+
+
+            return Ok(values.Select(x => x.Data));
         }
 
         // GET: api/USer/5

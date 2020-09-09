@@ -4,7 +4,6 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 
-
 namespace ModularSystem.Messaging.RabbitMQ.Extensions
 {
     public static class SubscribeMessage
@@ -21,9 +20,10 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
             autoDelete: false,
             arguments: null);
 
-            var consumer = new EventingBasicConsumer(channel);
+            var consumer = new AsyncEventingBasicConsumer(channel);
 
-            consumer.Received += (model, ea) => {
+            consumer.Received += async (model, ea) =>
+            {
                 var body = ea.Body;
                 var props = ea.BasicProperties;
                 var replyProps = channel.CreateBasicProperties();
@@ -32,8 +32,7 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
                     var message = Encoding.UTF8.GetString(body);
                     var requestCommand = JsonConvert.DeserializeObject<TCommand>(message);
 
-                    var responseAwait = handler.HandleWithEventAsync(requestCommand);
-                    responseAwait.Wait();
+                    await handler.HandleWithEventAsync(requestCommand);
                 }
 
             };

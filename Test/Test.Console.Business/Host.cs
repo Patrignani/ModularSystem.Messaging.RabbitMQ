@@ -49,7 +49,13 @@ namespace Test.Console.Business
                          var logger = sp.GetService<ILogger<UserHandle>>();
                          logger.LogError(e.GetBaseException().Message);
                      });
-                 });
+                 })
+                  .RequestReplyCommand<UserCommandGetAll, ICollection<User>, UserHandle>()
+                  .RequestReplyCommand<UserCommandGet, User, UserHandle>()
+                  .SubscribeToCommand<UserCommandDelete, UserHandle>()
+                  .RequestReplyCommand<UserCommandInsert, UserId, UserHandle>()
+                  .SubscribeToCommand<UserCommandUpdate, UserHandle>();
+
                  services.AddScoped<ICommandHandler<UserCommandGetAll, ICollection<User>>, UserHandle>();
                  services.AddScoped<ICommandHandler<UserCommandGet, User>, UserHandle>();
                  services.AddScoped<ICommandHandler<UserCommandDelete>, UserHandle>();
@@ -72,13 +78,13 @@ namespace Test.Console.Business
               .UseConsoleLifetime()
              .Build();
 
-            host.Services
-             .UseRabbitMq()
-             .RequestReplyCommand<UserCommandGetAll, ICollection<User>>()
-             .RequestReplyCommand<UserCommandGet, User>()
-             .SubscribeToCommand<UserCommandDelete>()
-             .RequestReplyCommand<UserCommandInsert, UserId>()
-             .SubscribeToCommand<UserCommandUpdate>();
+            //host.Services
+            // .UseRabbitMq()
+            // .RequestReplyCommand<UserCommandGetAll, ICollection<User>>()
+            // .RequestReplyCommand<UserCommandGet, User>()
+            // .SubscribeToCommand<UserCommandDelete>()
+            // .RequestReplyCommand<UserCommandInsert, UserId>()
+            // .SubscribeToCommand<UserCommandUpdate>();
 
             return host;
         }

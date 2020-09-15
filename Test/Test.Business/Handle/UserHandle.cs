@@ -35,7 +35,7 @@ namespace Test.Business.Handle
 
         public async Task HandleWithEventAsync(UserCommandDelete command)
         {
-            
+            await Task.Delay(10);
         }
 
         public async Task<UserId> HandleWithEventAsync(UserCommandInsert command)
@@ -45,7 +45,7 @@ namespace Test.Business.Handle
 
         public async Task HandleWithEventAsync(UserCommandUpdate command)
         {
-           
+             await Task.Delay(10);
         }
     }
 }

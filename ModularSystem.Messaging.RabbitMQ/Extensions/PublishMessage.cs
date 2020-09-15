@@ -18,12 +18,12 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
             _traceException = traceException;
         }
 
-        public void Publish<ICommand>(IModel channel, ICommand command)
+        public void Publish<ICommand>(IModel channel, ICommand command, string queueName = null)
         {
-            var queuName = command.GetType().Name;
+            queueName = string.IsNullOrEmpty(queueName) ? command.GetType().Name : queueName;
             var properties = channel.CreateBasicProperties();
             properties.Persistent = true;
-            channel.QueueDeclare(queuName, durable: true,
+            channel.QueueDeclare(queueName, durable: true,
                                   exclusive: false,
                                   autoDelete: false,
                                   arguments: null);
@@ -31,7 +31,7 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(command));
 
             channel.BasicPublish(exchange: "",
-                                 routingKey: queuName,
+                                 routingKey: queueName,
                                  basicProperties: properties,
                                  body: body);
         }

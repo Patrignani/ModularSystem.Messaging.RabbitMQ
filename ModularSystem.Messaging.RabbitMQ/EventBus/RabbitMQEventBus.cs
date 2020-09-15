@@ -21,38 +21,50 @@ namespace ModularSystem.Messaging.RabbitMQ.EventBus
 
         public async Task<RabbitRPC<TResult>> PublishWaitAsync<TResult>(Command<TResult> command, string queueName = null)
         {
-            var @return = new RabbitRPC<TResult>();
+            var rabbitRPC = new RabbitRPC<TResult>();
             try
             {
-                @return.MessageTask.StartCounting();
+                rabbitRPC.MessageTask.StartCounting();
                 queueName = string.IsNullOrEmpty(queueName) ? command.GetType().Name : queueName;
 
-                @return.MessageTask.SetQueueName(queueName);
+                rabbitRPC.MessageTask.SetQueueName(queueName);
 
                 if (await ExistQueue(queueName))
                 {
-                    @return.MessageTask.ExistQueue();
-                    @return.Data = await _publishMessage.SendAsync(_channel, command, queueName);
+                    rabbitRPC.MessageTask.ExistQueue();
+                    rabbitRPC.Data = await _publishMessage.SendAsync(_channel, command, queueName);
 
                 }
                 else
                 {
-                    @return.MessageTask.NotExistQueue();
-                    @return.MessageTask.SetMessage("Queue non-existent");
+                    rabbitRPC.MessageTask.NotExistQueue();
+                    rabbitRPC.MessageTask.SetMessage("Queue non-existent");
                 }
             }
             catch (Exception e)
             {
-                @return.MessageTask.SetMessage(e.GetBaseException().Message);
+                rabbitRPC.MessageTask.SetMessage(e.GetBaseException().Message);
             }
             finally
             {
-                @return.MessageTask.StopCounting();
+                rabbitRPC.MessageTask.StopCounting();
             }
 
-            return @return;
+            return rabbitRPC;
         }
 
+        public async Task<TResult> PublishBasicRpcAsync<TResult>(Command<TResult> command, string queueName = null)
+            where TResult : class
+        {
+            queueName = string.IsNullOrEmpty(queueName) ? command.GetType().Name : queueName;
+
+            TResult data = null;
+
+            if (await ExistQueue(queueName))
+                data = await _publishMessage.SendAsync(_channel, command, queueName);
+
+            return data;
+        }
 
         public async Task<bool> ExistQueue(string queueName)
         {
@@ -71,15 +83,6 @@ namespace ModularSystem.Messaging.RabbitMQ.EventBus
             return await Task.FromResult(exist);
         }
 
-        public async Task PublishForgetAsync(Command command)
-        {
-            _publishMessage.Publish(_channel, command);
-            await Task.CompletedTask;
-        }
-
-        public void PublishForget(Command command)
-        {
-            _publishMessage.Publish(_channel, command);
-        }
+        public void PublishForget(Command command, string queueName = null) => _publishMessage.Publish(_channel, command, queueName);
     }
 }

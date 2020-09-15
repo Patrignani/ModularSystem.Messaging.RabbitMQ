@@ -13,10 +13,10 @@ namespace Test.Gateway.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class USerController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly IRabbitMQEventBus _bus;
-        public USerController(IRabbitMQEventBus bus)
+        public UserController(IRabbitMQEventBus bus)
         {
             _bus = bus;
         }
@@ -26,18 +26,36 @@ namespace Test.Gateway.Controllers
         public async Task<ActionResult> Get()
         {
 
-            var tasks = new List<Task<RabbitRPC<ICollection<User>>>>();
-            for (var count = 0; count < 2; count++)
+            //var tasks = new List<Task<RabbitRPC<ICollection<User>>>>();
+            //for (var count = 0; count < 2; count++)
+            //{
+            //    var userCommand = new UserCommandGetAll();
+            //    tasks.Add(_bus.PublishWaitAsync(userCommand, "Teste"));
+            //    var value2 = await _bus.PublishBasicRpcAsync(userCommand, "Teste");
+            //}
+
+            //_bus.PublishForget(new UserCommandUpdate
+            //{
+            //    User = new UserUpdate
+            //    {
+            //        Address = "aaaa"
+            //    }
+            //});
+
+            _bus.PublishForget(new UserCommandDelete
             {
-                var userCommand = new UserCommandGetAll();
-                tasks.Add(_bus.PublishWaitAsync(userCommand, "Teste"));
-               
-            }
-
-            var values = await Task.WhenAll(tasks);
+               Id = 10
+            }, "Deletar");
 
 
-            return Ok(values.Select(x => x.Data));
+
+            //var values = await Task.WhenAll(tasks);
+
+
+
+            return Ok();
+
+           // return Ok(values.Select(x => x.Data));
         }
 
         // GET: api/USer/5

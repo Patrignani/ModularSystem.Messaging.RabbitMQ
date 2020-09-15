@@ -49,7 +49,7 @@ namespace ModularSystem.Messaging.RabbitMQ.Extensions
                 }
             };
 
-            channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+            channel.BasicConsume(queue: queueName, autoAck: option.AutoAck, consumer: consumer);
 
         }
     }

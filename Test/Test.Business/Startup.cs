@@ -34,8 +34,7 @@ namespace Test.Business
               })
               .RequestReplyCommand<UserCommandGet, User, UserHandle>()
               .SubscribeToCommand<UserCommandDelete, UserHandle>(option => {
-                  option.BasicQos = false;
-                  option.AutoAck = false;
+                  option.QueueName = "Deletar";
               })
               .RequestReplyCommand<UserCommandInsert, UserId, UserHandle>()
               .SubscribeToCommand<UserCommandUpdate, UserHandle>();

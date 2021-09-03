@@ -20,7 +20,7 @@ namespace ModularSystem.Messaging.RabbitMQ
             RabbitMQOption option = new RabbitMQOption();
             optionAction(option);
 
-            var factory = new ConnectionFactory();
+            var factory = new ConnectionFactory { DispatchConsumersAsync = true};
             var section = configuration.GetSection(option.ConnectionFactory);
             section.Bind(factory);
 
